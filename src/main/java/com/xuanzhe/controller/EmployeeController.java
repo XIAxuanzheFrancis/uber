@@ -6,6 +6,7 @@ import com.xuanzhe.common.R;
 import com.xuanzhe.pojo.Employee;
 import com.xuanzhe.service.EmployeeService;
 import com.xuanzhe.service.impl.EmployeeServiceImpl;
+import java.time.LocalDateTime;
 import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,19 @@ public class EmployeeController {
   public R<String> logout(HttpServletRequest request){
     request.getSession().removeAttribute("employee");
     return R.success("Exit successful");
+  }
+
+  @PostMapping
+  public R<String> save(HttpServletRequest req, @RequestBody Employee employee){
+    log.info("add employee's informations: {}", employee.toString());
+    employee.setPassword(DigestUtils.md5DigestAsHex(("123456".getBytes())));
+    employee.setCreateTime(LocalDateTime.now());
+    employee.setUpdateTime(LocalDateTime.now());
+    Long empId = (Long)req.getSession().getAttribute("employee");
+    employee.setCreateUser(empId);
+    employee.setUpdateUser(empId);
+    employeeService.save(employee);
+    return R.success("Add Employee Success");
   }
 
 }
