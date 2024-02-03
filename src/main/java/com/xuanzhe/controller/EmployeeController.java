@@ -31,6 +31,22 @@ public class EmployeeController {
     queryWrapper.eq(Employee::getUsername, employee.getUsername());
     Employee emp = employeeService.getOne(queryWrapper);
 
+
+    if(emp == null)
+      return R.error("Login Failure");
+    else if(!emp.getPassword().equals(password))
+      return R.error("Login Failure");
+    else if(emp.getStatus()==0){
+      return R.error("Account disabled");
+    }
+    request.getSession().setAttribute("employee",emp.getId());
+    return R.success(emp);
+  }
+
+  @PostMapping("/logout")
+  public R<String> logout(HttpServletRequest request){
+    request.getSession().removeAttribute("employee");
+    return R.success("Exit successful");
   }
 
 }
